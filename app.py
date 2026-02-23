@@ -8,7 +8,14 @@ and shared styling.
 Run: streamlit run app.py
 """
 
+# ── Thread-safety guards (must come before any ML library import) ────────────
 import os
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+os.environ.setdefault("VECLIB_MAXIMUM_THREADS", "1")
+
 import streamlit as st
 
 st.set_page_config(

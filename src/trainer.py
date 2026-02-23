@@ -37,7 +37,7 @@ def get_models() -> dict:
             n_estimators=200,
             max_depth=8,
             min_samples_leaf=3,
-            n_jobs=-1,
+            n_jobs=1,          # limited for cloud container
             random_state=42
         ),
         "Gradient Boosting": GradientBoostingClassifier(
@@ -72,7 +72,7 @@ def get_models() -> dict:
 def run_cross_validation(model, X_train, y_train, n_folds=5) -> dict:
     """Run stratified k-fold cross-validation and return AUC stats."""
     cv = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=42)
-    scores = cross_val_score(model, X_train, y_train, cv=cv, scoring="roc_auc", n_jobs=-1)
+    scores = cross_val_score(model, X_train, y_train, cv=cv, scoring="roc_auc", n_jobs=1)  # limited for cloud container
     return {
         "cv_auc_mean": float(scores.mean()),
         "cv_auc_std":  float(scores.std()),

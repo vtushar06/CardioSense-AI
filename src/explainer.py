@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import streamlit as st
 import matplotlib
 matplotlib.use("Agg")  # non-interactive backend — required for Streamlit
 import matplotlib.pyplot as plt
@@ -11,8 +12,14 @@ import shap
 from .data_loader import COLUMN_LABELS, NORMAL_RANGES
 
 
+@st.cache_resource(show_spinner=False)
 def make_explainer(model, X_train: np.ndarray, model_name: str):
-    """Create a SHAP explainer appropriate for the model type."""
+    """Create a SHAP explainer appropriate for the model type.
+
+    Cached with @st.cache_resource so the explainer is built once per app
+    lifetime and reused across all user sessions — avoids expensive rebuilds
+    on every prediction and reduces peak memory on the cloud container.
+    """
     tree_based = ["Random Forest", "Gradient Boosting", "XGBoost", "LightGBM", "Decision Tree"]
 
     if any(name in model_name for name in tree_based):
