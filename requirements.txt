@@ -10,6 +10,17 @@ xgboost==2.0.3
 lightgbm==4.4.0
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.3.0+cpu
-reportlab==4.2.0
+fpdf2==2.7.9
 optuna==3.6.1
 joblib>=1.4.0
+
+# Milestone 2: Agentic AI Support
+langchain==0.2.14
+langchain-community==0.2.12
+langchain-groq==0.1.9
+langgraph==0.2.22
+groq==0.9.0
+faiss-cpu==1.8.0.post1
+sentence-transformers==3.0.1
+pydantic==2.8.2
+python-dotenv==1.0.1
