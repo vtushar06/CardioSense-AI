@@ -121,13 +121,15 @@ if st.button("🚀  Train All Models", type="primary", disabled=(df is None)):
 
     progress.progress(100)
     status.empty()
-    st.cache_resource.clear()
-    st.success(f"✅  Training complete! Best model: **{best_name}**")
 
     np.save("models/X_test.npy",  X_te)
     np.save("models/X_train.npy", X_tr)
     np.save("models/y_test.npy",  y_te)
     np.save("models/y_train.npy", y_tr)
+
+    st.cache_resource.clear()
+    st.success(f"✅  Training complete! Best model: **{best_name}**")
+    st.rerun()
 
 # ── Results ───────────────────────────────────────────────────────────────────
 if _models_ready():

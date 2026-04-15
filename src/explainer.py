@@ -23,7 +23,10 @@ def make_explainer(model, X_train: np.ndarray, model_name: str):
     tree_based = ["Random Forest", "Gradient Boosting", "XGBoost", "LightGBM", "Decision Tree"]
 
     if any(name in model_name for name in tree_based):
-        return shap.TreeExplainer(model)
+        estimator = model
+        if hasattr(model, "calibrated_classifiers_"):
+            estimator = model.calibrated_classifiers_[0].estimator
+        return shap.TreeExplainer(estimator)
     else:
         background = shap.sample(X_train, min(50, len(X_train)))
         return shap.KernelExplainer(model.predict_proba, background)
