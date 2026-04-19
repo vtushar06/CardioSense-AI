@@ -8,6 +8,7 @@ import streamlit as st
 from src.preprocessor import load_artifacts
 from src.trainer import load_trained_models
 from src.plots import dnn_training_history, confusion_matrix_fig
+from src.deep_model import TORCH_AVAILABLE
 
 
 def _models_ready() -> bool:
@@ -37,6 +38,14 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+if not TORCH_AVAILABLE:
+    st.warning(
+        "⚠️  PyTorch is not available in this environment. "
+        "The Neural Network page requires PyTorch — it works locally but may be "
+        "unavailable on some cloud deployments depending on the Python version."
+    )
+    st.stop()
 
 if not _models_ready():
     st.warning("⚠️  Train classical models first — go to the **Train Models** page.")

@@ -373,7 +373,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-_sample_path = "data/sample_patients.csv"
+_sample_path = "samples/sample_patients.csv"
 if os.path.exists(_sample_path):
     with open(_sample_path, "rb") as _f:
         _sample_bytes = _f.read()

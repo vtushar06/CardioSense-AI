@@ -55,7 +55,7 @@ with st.expander("📋  Expected CSV format", expanded=False):
     st.dataframe(sample, use_container_width=True)
     st.caption("All 13 feature columns required. Column names are case-insensitive.")
 
-_sample_path = "data/sample_patients.csv"
+_sample_path = "samples/sample_patients.csv"
 if os.path.exists(_sample_path):
     with open(_sample_path, "rb") as _f:
         _sample_bytes = _f.read()
