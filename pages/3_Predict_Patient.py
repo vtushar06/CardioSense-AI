@@ -140,6 +140,11 @@ if st.button("🚀  Run Prediction", type="primary"):
     )
     prob = pred["probability"]
 
+    flags = get_rule_based_flags(patient)
+    st.session_state["last_patient"]    = patient
+    st.session_state["last_prediction"] = pred
+    st.session_state["last_flags"]      = flags
+
     # ── Risk banner ──────────────────────────────────────────────────────────
     if prob >= 0.66:
         st.markdown(
