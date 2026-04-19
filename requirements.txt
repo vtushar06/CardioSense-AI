@@ -14,3 +14,13 @@ torchvision==0.18.0+cpu
 reportlab==4.2.0
 groq>=0.9.0
 python-dotenv>=1.0.0
+langchain>=0.2.14
+langchain-community>=0.2.12
+langchain-groq>=0.1.9
+langgraph>=0.2.22
+faiss-cpu>=1.8.0
+sentence-transformers>=3.0.1
+langchain-text-splitters>=0.2.4
+langchain-huggingface>=0.0.3
+pydantic>=2.8.2
+joblib>=1.4.0
