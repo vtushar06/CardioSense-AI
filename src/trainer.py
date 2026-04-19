@@ -20,6 +20,21 @@ warnings.filterwarnings("ignore")
 
 def get_models() -> dict:
     """Return dict of model name to configured estimator."""
+    # XGBoost 2.x + sklearn 1.6: explicitly tag as classifier so
+    # is_classifier() passes inside CalibratedClassifierCV & cross_val_score.
+    _xgb = xgb.XGBClassifier(
+        n_estimators=200,
+        max_depth=5,
+        learning_rate=0.05,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        objective="binary:logistic",
+        eval_metric="logloss",
+        random_state=42,
+        verbosity=0,
+    )
+    _xgb._estimator_type = "classifier"  # force sklearn 1.6 recognition
+
     return {
         "Logistic Regression": LogisticRegression(
             max_iter=2000,
@@ -37,7 +52,7 @@ def get_models() -> dict:
             n_estimators=200,
             max_depth=8,
             min_samples_leaf=3,
-            n_jobs=-1,
+            n_jobs=1,
             random_state=42
         ),
         "Gradient Boosting": GradientBoostingClassifier(
@@ -47,16 +62,7 @@ def get_models() -> dict:
             subsample=0.85,
             random_state=42
         ),
-        "XGBoost": xgb.XGBClassifier(
-            n_estimators=200,
-            max_depth=5,
-            learning_rate=0.05,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            eval_metric="logloss",
-            random_state=42,
-            verbosity=0
-        ),
+        "XGBoost": _xgb,
         "LightGBM": lgb.LGBMClassifier(
             n_estimators=200,
             max_depth=5,
@@ -65,14 +71,14 @@ def get_models() -> dict:
             subsample=0.8,
             random_state=42,
             verbose=-1
-        )
+        ),
     }
 
 
 def run_cross_validation(model, X_train, y_train, n_folds=5) -> dict:
     """Run stratified k-fold cross-validation and return AUC stats."""
     cv = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=42)
-    scores = cross_val_score(model, X_train, y_train, cv=cv, scoring="roc_auc", n_jobs=-1)
+    scores = cross_val_score(model, X_train, y_train, cv=cv, scoring="roc_auc", n_jobs=1)  # limited for cloud container
     return {
         "cv_auc_mean": float(scores.mean()),
         "cv_auc_std":  float(scores.std()),
@@ -141,9 +147,13 @@ def train_all(X_train, y_train, X_test, y_test,
         # Final fit on the full training set
         model.fit(X_train, y_train)
 
-        # Calibrate probabilities
-        if calibrate:
-            cal_model = CalibratedClassifierCV(model, method="isotonic", cv=3)
+        # Calibrate probabilities (cv="prefit" — model already fitted above)
+        # XGBoost & LightGBM are excluded: they already output calibrated
+        # probabilities via binary:logistic/binary objectives, and
+        # CalibratedClassifierCV breaks with sklearn 1.6 for these models.
+        _needs_calibration = calibrate and name not in ("XGBoost", "LightGBM")
+        if _needs_calibration:
+            cal_model = CalibratedClassifierCV(model, method="isotonic", cv="prefit")
             cal_model.fit(X_train, y_train)
             trained[name] = cal_model
         else:

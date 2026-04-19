@@ -31,10 +31,9 @@ def fill_missing(df: pd.DataFrame) -> pd.DataFrame:
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """Create derived features from raw clinical data."""
     df = df.copy()
-
-    # Age risk buckets
+    
     df["age_bucket"] = pd.cut(
-        df["age"],
+        df["age"].clip(1, 119),
         bins=[0, 40, 55, 65, 120],
         labels=[0, 1, 2, 3]  # 0=young, 1=middle, 2=senior, 3=elderly
     ).astype(int)

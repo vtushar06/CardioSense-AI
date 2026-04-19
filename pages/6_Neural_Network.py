@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from src.preprocessor import load_artifacts, build_pipeline
+from src.preprocessor import load_artifacts
 from src.trainer import load_trained_models
 from src.plots import dnn_training_history, confusion_matrix_fig
 
@@ -70,20 +70,14 @@ with c2:
     batch_size = st.select_slider("📦  Batch size", [16, 32, 64], value=32)
     dropout    = st.slider("🎲  Dropout rate", 0.1, 0.5, 0.3, step=0.05)
 
-if not os.path.exists("models/X_train.npy"):
-    st.warning("⚠️  X_train.npy not found — retrain classical models first.")
+if not os.path.exists("models/y_train.npy"):
+    st.warning("⚠️  y_train.npy not found — retrain classical models first.")
     st.stop()
 
 X_train_np = np.load("models/X_train.npy")
 X_test_np  = np.load("models/X_test.npy")
-
-if not os.path.exists("data/heart.csv"):
-    st.error("❌  heart.csv missing — re-upload the dataset.")
-    st.stop()
-
-df_raw = pd.read_csv("data/heart.csv")
-scaler, feature_cols = load_artifacts()
-_, _, y_tr, y_te, _, _ = build_pipeline(df_raw, apply_smote=False)
+y_tr       = np.load("models/y_train.npy")
+y_te       = np.load("models/y_test.npy")
 
 st.markdown("<br>", unsafe_allow_html=True)
 

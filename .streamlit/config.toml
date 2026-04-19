@@ -1,0 +1,14 @@
+[server]
+headless = true
+port = 8501
+enableXsrfProtection = true
+maxUploadSize = 50
+
+[browser]
+gatherUsageStats = false
+
+[runner]
+magicEnabled = false
+
+[global]
+developmentMode = false
