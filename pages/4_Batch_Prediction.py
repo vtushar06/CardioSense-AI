@@ -45,7 +45,7 @@ if not _models_ready():
 
 all_models, results, best_name, best_model, scaler, feature_cols = _get_trained_artifacts()
 
-# ── Format guide ─────────────────────────────────────────────────────────────
+# ── Format guide + sample download ──────────────────────────────────────────
 with st.expander("📋  Expected CSV format", expanded=False):
     sample = pd.DataFrame([{
         "age": 63, "sex": 1, "cp": 3, "trestbps": 145, "chol": 233,
@@ -54,6 +54,21 @@ with st.expander("📋  Expected CSV format", expanded=False):
     }])
     st.dataframe(sample, use_container_width=True)
     st.caption("All 13 feature columns required. Column names are case-insensitive.")
+
+_sample_path = "data/sample_patients.csv"
+if os.path.exists(_sample_path):
+    with open(_sample_path, "rb") as _f:
+        _sample_bytes = _f.read()
+    col_dl, _ = st.columns([1, 3])
+    with col_dl:
+        st.download_button(
+            "⬇️  Download Sample CSV (14 patients)",
+            data=_sample_bytes,
+            file_name="sample_patients.csv",
+            mime="text/csv",
+            use_container_width=True,
+            help="Ready-to-use file with 14 anonymised patients across varied risk profiles.",
+        )
 
 st.markdown("---")
 

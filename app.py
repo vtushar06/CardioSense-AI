@@ -373,6 +373,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+_sample_path = "data/sample_patients.csv"
+if os.path.exists(_sample_path):
+    with open(_sample_path, "rb") as _f:
+        _sample_bytes = _f.read()
+    col_dl, _ = st.columns([1, 4])
+    with col_dl:
+        st.download_button(
+            "⬇️  Download Sample Patient CSV",
+            data=_sample_bytes,
+            file_name="sample_patients.csv",
+            mime="text/csv",
+            help="14 anonymised patient records — use this to test Batch Prediction or Patient Risk Prediction.",
+            use_container_width=True,
+        )
+
 c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("🤖  ML Models",       "6 + DNN",      "Trained & compared")
 c2.metric("📐  Features",         "13 + 4",       "Clinical + engineered")
