@@ -2,7 +2,7 @@ import os
 import streamlit as st
 
 from src.explainer import get_rule_based_flags
-from src.llm_agent import run_agent, GROQ_API_KEY
+from src.llm_agent import run_agent, get_api_key
 from src.pdf_export import generate_pdf_report
 
 
@@ -154,7 +154,7 @@ with col_q:
             key="user_q2",
         )
 
-if not GROQ_API_KEY:
+if not get_api_key():
     st.warning(
         "⚠️  No Groq API key found — the AI will use a structured template instead of live LLM generation. "
         "Add your key to the `.env` file as `GROQ_API_KEY=your_key` and restart the app."

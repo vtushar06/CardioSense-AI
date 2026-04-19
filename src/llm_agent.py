@@ -3,8 +3,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 MODEL = "llama-3.1-8b-instant"
+
+
+def get_api_key() -> str:
+    # On Streamlit Cloud, secrets are in st.secrets.
+    # Locally, they're in .env. Try both.
+    try:
+        import streamlit as st
+        key = st.secrets.get("GROQ_API_KEY", "")
+        if key:
+            return key
+    except Exception:
+        pass
+    return os.getenv("GROQ_API_KEY", "")
 
 CHEST_PAIN_MAP = {0: "Typical Angina", 1: "Atypical Angina", 2: "Non-Anginal Pain", 3: "Asymptomatic"}
 ECG_MAP = {0: "Normal", 1: "ST-T Abnormality", 2: "LV Hypertrophy"}
@@ -74,12 +86,13 @@ def build_prompt(patient_context: str, user_query: str) -> str:
 
 
 def call_groq(patient_context: str, user_query: str) -> dict:
-    if not GROQ_API_KEY:
+    api_key = get_api_key()
+    if not api_key:
         return {"success": False, "text": "", "error": "No API key found"}
 
     try:
         from groq import Groq
-        client = Groq(api_key=GROQ_API_KEY)
+        client = Groq(api_key=api_key)
 
         system_prompt, user_prompt = build_prompt(patient_context, user_query)
 
@@ -202,7 +215,7 @@ def run_agent(patient: dict, prediction: dict, flags: list, user_query: str) -> 
     state["patient_context"] = build_patient_context(patient, prediction, flags)
 
     state["step"] = "calling_llm"
-    if GROQ_API_KEY:
+    if get_api_key():
         result = call_groq(state["patient_context"], user_query)
         if result["success"]:
             state["llm_text"] = result["text"]
