@@ -82,8 +82,12 @@ def build_pipeline(df: pd.DataFrame, test_size=0.2, apply_smote=True):
     )
 
     if apply_smote:
-        smote = SMOTE(random_state=42, k_neighbors=5)
-        X_train, y_train = smote.fit_resample(X_train, y_train)
+        import numpy as np
+        min_class_count = min(np.bincount(y_train.astype(int)))
+        k = min(5, min_class_count - 1)
+        if k >= 1:
+            smote = SMOTE(random_state=42, k_neighbors=k)
+            X_train, y_train = smote.fit_resample(X_train, y_train)
 
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
