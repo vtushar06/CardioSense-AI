@@ -77,8 +77,10 @@ def get_models() -> dict:
 
 def run_cross_validation(model, X_train, y_train, n_folds=5) -> dict:
     """Run stratified k-fold cross-validation and return AUC stats."""
-    cv = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=42)
-    scores = cross_val_score(model, X_train, y_train, cv=cv, scoring="roc_auc", n_jobs=1)  # limited for cloud container
+    min_class = int(np.bincount(y_train.astype(int)).min())
+    actual_folds = max(2, min(n_folds, min_class))
+    cv = StratifiedKFold(n_splits=actual_folds, shuffle=True, random_state=42)
+    scores = cross_val_score(model, X_train, y_train, cv=cv, scoring="roc_auc", n_jobs=1)
     return {
         "cv_auc_mean": float(scores.mean()),
         "cv_auc_std":  float(scores.std()),
@@ -153,9 +155,15 @@ def train_all(X_train, y_train, X_test, y_test,
         # CalibratedClassifierCV breaks with sklearn 1.6 for these models.
         _needs_calibration = calibrate and name not in ("XGBoost", "LightGBM")
         if _needs_calibration:
-            cal_model = CalibratedClassifierCV(model, method="isotonic", cv="prefit")
-            cal_model.fit(X_train, y_train)
-            trained[name] = cal_model
+            # isotonic needs >=3 samples per class; fall back to sigmoid for small datasets
+            min_class = int(np.bincount(y_train.astype(int)).min())
+            method = "isotonic" if min_class >= 3 else "sigmoid"
+            try:
+                cal_model = CalibratedClassifierCV(model, method=method, cv="prefit")
+                cal_model.fit(X_train, y_train)
+                trained[name] = cal_model
+            except Exception:
+                trained[name] = model
         else:
             trained[name] = model
 
