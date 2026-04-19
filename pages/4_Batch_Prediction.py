@@ -59,6 +59,21 @@ st.markdown("---")
 
 uploaded = st.file_uploader("📁  Upload patient CSV", type=["csv"])
 
+if not uploaded:
+    st.markdown(
+        """
+        <div style="
+            background:#F7FAFC; border:1px solid #E2E8F0; border-radius:12px;
+            padding:1.6rem 2rem; text-align:center; color:#718096; margin-top:0.5rem;
+        ">
+            <div style="font-size:2rem; margin-bottom:0.4rem;">📂</div>
+            <div style="font-weight:600; color:#4A5568; margin-bottom:0.2rem;">No file uploaded yet</div>
+            <div style="font-size:0.88rem;">Upload a CSV above to score multiple patients at once.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 if uploaded:
     df = load_from_upload(uploaded)
     st.info(f"ℹ️  Loaded **{len(df)}** patients")
@@ -111,12 +126,16 @@ if uploaded:
             use_container_width=True,
         )
 
-        st.download_button(
-            "⬇️  Download Results CSV",
-            data=result.to_csv(index=False),
-            file_name="cardiosense_predictions.csv",
-            mime="text/csv",
-        )
+        st.markdown("<br>", unsafe_allow_html=True)
+        col_dl, _ = st.columns([1, 3])
+        with col_dl:
+            st.download_button(
+                "⬇️  Download Results CSV",
+                data=result.to_csv(index=False),
+                file_name="cardiosense_predictions.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
 
         if 2 <= len(df) <= 4:
             st.markdown("---")

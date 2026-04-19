@@ -38,6 +38,7 @@ c1.metric("👥  Total Patients",  stats["n_patients"])
 c2.metric("📐  Features",        stats["n_features"])
 c3.metric("❤️  Disease Cases",   stats["class_distribution"].get(1, 0))
 c4.metric("❓  Missing Values",  f"{stats['missing_pct']:.1f}%")
+st.markdown("<br>", unsafe_allow_html=True)
 
 st.markdown("---")
 
