@@ -50,6 +50,25 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+_sample_path = "samples/sample_patients.csv"
+if os.path.exists(_sample_path):
+    with open(_sample_path, "rb") as _f:
+        _sample_bytes = _f.read()
+    col_info, col_dl = st.columns([3, 1])
+    with col_info:
+        st.info(
+            "💡 Don't have the dataset yet? Download the **sample CSV** (14 patients, includes `target` column) "
+            "to test the full training pipeline."
+        )
+    with col_dl:
+        st.download_button(
+            "⬇️ Sample CSV",
+            data=_sample_bytes,
+            file_name="sample_patients.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+
 uploaded = st.file_uploader(
     "Upload the UCI Heart Disease CSV",
     type=["csv"],
